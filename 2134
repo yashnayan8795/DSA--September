@@ -1,0 +1,130 @@
+2134. Minimum Swaps to Group All 1's Together II
+
+A swap is defined as taking two distinct positions in an array and swapping the values in them.
+A circular array is defined as an array where we consider the first element and the last element to be adjacent.
+Given a binary circular array nums, return the minimum number of swaps required to group all 1's present in the array together at any location.
+
+
+Example 1:
+
+    Input: nums = [0,1,0,1,1,0,0]
+    Output: 1
+      Explanation: Here are a few of the ways to group all the 1's together:
+      [0,0,1,1,1,0,0] using 1 swap.
+      [0,1,1,1,0,0,0] using 1 swap.
+      [1,1,0,0,0,0,1] using 2 swaps (using the circular property of the array).
+      There is no way to group all 1's together with 0 swaps.
+      Thus, the minimum number of swaps required is 1.
+
+Example 2:
+
+    Input: nums = [0,1,1,1,0,0,1,1,0]
+    Output: 2
+      Explanation: Here are a few of the ways to group all the 1's together:
+      [1,1,1,0,0,0,0,1,1] using 2 swaps (using the circular property of the array).
+      [1,1,1,1,1,0,0,0,0] using 2 swaps.
+      There is no way to group all 1's together with 0 or 1 swaps.
+      Thus, the minimum number of swaps required is 2.
+
+Example 3:
+
+    Input: nums = [1,1,0,0,1]
+    Output: 0
+      Explanation: All the 1's are already grouped together due to the circular property of the array.
+      Thus, the minimum number of swaps required is 0.
+ 
+
+Constraints:
+
+    1 <= nums.length <= 105
+    nums[i] is either 0 or 1.
+
+## Solution:
+
+C++
+
+    class Solution {
+    public:
+        int minSwaps(vector<int>& nums) {
+            int k = accumulate(nums.begin(), nums.end(), 0);
+            int n = nums.size();
+            int c = accumulate(nums.begin(), nums.begin() + k, 0);
+            int m = c;
+            for (int i = k; i < n + k; ++i) {
+                c += nums[i % n] - nums[(i - k + n) % n];
+                m = max(m, c);
+            }
+            return k - m;
+        }
+    };
+
+
+
+Problem Context:
+
+    The problem this code is trying to solve is finding the minimum number of swaps required to group all the 1s in a binary array (nums) together.
+
+Code Walkthrough:
+
+  Step 1: Calculate the Total Number of 1's (k)
+
+            int k = accumulate(nums.begin(), nums.end(), 0);
+            
+      k: This variable stores the total number of 1s in the array nums. It uses the accumulate function,
+      which sums up all the elements in the array.
+      Since the array contains only 0s and 1s, this sum gives us the total count of 1s.
+
+  Step 2: Get the Size of the Array (n)
+
+              int n = nums.size();
+              
+      n: This variable stores the size of the array, i.e., the total number of elements in nums.
+      
+  Step 3: Calculate the Initial Window's 1's Count (c)
+  
+              int c = accumulate(nums.begin(), nums.begin() + k, 0);
+              
+      c: This variable counts the number of 1s in the first k elements of the array.
+      The accumulate function is used again here, but this time it sums up only the 
+      first k elements (from nums.begin() to nums.begin() + k).
+    
+  Step 4: Set the Maximum 1's in Any Window (m)
+
+              int m = c;
+
+  
+      m: Initially, the maximum number of 1s found in any window of size k is set to c, the count of 1s in the first window.
+
+  Step 5: Sliding Window Approach to Find the Maximum 1's in Any Window
+
+              for (int i = k; i < n + k; ++i) {
+                  c += nums[i % n] - nums[(i - k + n) % n];
+                  m = max(m, c);
+              }
+  
+      Sliding Window: The loop slides a window of size k across the array, but with a twist: it wraps around the array using modulo operations (i % n and (i - k + n) % n), which allows the window to slide in a circular manner.
+    
+      c Update: For each new window position, the count c is updated by adding the element that just entered the window (nums[i % n]) and subtracting the element that just left the window (nums[(i - k + n) % n]).
+
+      m Update: The maximum number of 1s (m) in any window of size k is updated by taking the maximum of the current m and the updated c.
+
+  Step 6: Calculate and Return the Result (Minimum Swaps)
+
+                return k - m;
+
+      Return Statement: The function returns the value k - m, which is the minimum number of swaps needed.
+      Here's why:
+        k is the total number of 1s in the array.
+        m is the maximum number of 1s found in any window of size k.
+        The difference k - m represents the minimum number of 0s in the best window of k elements. Swapping these 0s with 1s from outside this window would group all 1s together.
+
+    Example Illustration:
+    
+      Consider the array [1, 0, 1, 0, 1, 0, 0, 1, 1].
+      
+      Total 1's (k): There are 5 ones, so k = 5.
+      Initial Window (c): For the first 5 elements [1, 0, 1, 0, 1], the count of 1s is 3.
+      Sliding Window: The loop will slide this window across the array, and the maximum number of 1s (m) in any window will be found. Suppose it finds a window with 4 ones.
+      Minimum Swaps: The result will be k - m = 5 - 4 = 1. So, at least 1 swap is needed to group all 1s together.
+      
+  This algorithm efficiently finds the minimum number of swaps needed using a sliding window approach, which is optimal for this type of problem.
